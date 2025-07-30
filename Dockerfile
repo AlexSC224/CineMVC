@@ -2,20 +2,21 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /app
 
-# Copiar archivos del proyecto
-COPY . ./
-
-# Restaurar paquetes y publicar la app
+# Copiar archivos del proyecto y restaurar
+COPY *.csproj ./
 RUN dotnet restore
-RUN dotnet publish -c Release -o out
+
+# Copiar todo el contenido y publicar
+COPY . ./
+RUN dotnet publish -c Release -o /app/publish
 
 # Etapa 2: Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 WORKDIR /app
-COPY --from=build /app/out ./
+COPY --from=build /app/publish .
 
-# Puerto por defecto
+# Exponer el puerto 80
 EXPOSE 80
 
-# Comando de inicio
+# Comando para iniciar la app
 ENTRYPOINT ["dotnet", "CineMVC.dll"]
