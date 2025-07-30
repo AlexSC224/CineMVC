@@ -1,0 +1,46 @@
+﻿@model CineMVC.Models.Funcion
+
+@{
+    ViewData["Title"] = "Eliminar";
+}
+
+<div class="container mt-4">
+    <h1>Eliminar</h1>
+    <h3 class="mb-3">¿Estás seguro de que quieres eliminar esta función?</h3>
+    <div>
+        <h4 class="mb-3">Función</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">
+                Fecha y Hora
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.FechaHora)
+            </dd>
+            <dt class="col-sm-2">
+                Precio de Entrada
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.PrecioEntrada)
+            </dd>
+            <dt class="col-sm-2">
+                Película
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Pelicula.Id)
+            </dd>
+            <dt class="col-sm-2">
+                Sala
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Sala.Id)
+            </dd>
+        </dl>
+
+        <form asp-action="Delete" class="mt-3">
+            <input type="hidden" asp-for="Id" />
+            <input type="submit" value="Eliminar" class="btn btn-danger" />
+            <a asp-action="Index" class="btn btn-secondary ms-2">Volver a la lista</a>
+        </form>
+    </div>
+</div>

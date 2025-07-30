@@ -1,8 +1,31 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Bienvenido al Cine";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4 fw-bold text-primary">🎬 Bienvenido a CineMVC</h1>
+    <p class="lead">Tu destino para vivir la mejor experiencia cinematográfica.</p>
+
+    <hr class="my-4" />
+
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-body">
+                    <h5 class="card-title">🎟️ ¿Qué ofrecemos?</h5>
+                    <ul class="list-group list-group-flush text-start">
+                        <li class="list-group-item">📽️ Cartelera actualizada con los últimos estrenos.</li>
+                        <li class="list-group-item">🛋️ Salas modernas y cómodas con sonido envolvente.</li>
+                        <li class="list-group-item">🕒 Funciones diarias en horarios flexibles.</li>
+                        <li class="list-group-item">👥 Reserva tus entradas en línea fácilmente.</li>
+                        <li class="list-group-item">💳 Pago rápido y seguro.</li>
+                    </ul>
+
+                    <div class="mt-4">
+                        <a class="btn btn-primary btn-lg" asp-controller="Peliculas" asp-action="Index">🎞️ Ver Cartelera</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

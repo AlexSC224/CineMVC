@@ -1,0 +1,52 @@
+﻿@model CineMVC.Models.Reserva
+
+@{
+    ViewData["Title"] = "Crear";
+}
+
+<div class="container mt-4">
+    <h1>Crear Reserva</h1>
+    <h4 class="mb-3">Reserva</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <div class="mb-3">
+                    <label asp-for="UserId" class="form-label">Usuario</label>
+                    <select asp-for="UserId" class="form-select" asp-items="ViewBag.UserId">
+                        <option value="">Seleccione un usuario</option>
+                    </select>
+                    <span asp-validation-for="UserId" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="FuncionId" class="form-label">Función</label>
+                    <select asp-for="FuncionId" class="form-select" asp-items="ViewBag.FuncionId">
+                        <option value="">Seleccione una función</option>
+                    </select>
+                    <span asp-validation-for="FuncionId" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="CantidadEntradas" class="form-label">Cantidad de Entradas</label>
+                    <input asp-for="CantidadEntradas" class="form-control" type="number" min="1" />
+                    <span asp-validation-for="CantidadEntradas" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Total" class="form-label">Total</label>
+                    <input asp-for="Total" class="form-control" type="number" step="0.01" readonly />
+                    <span asp-validation-for="Total" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <input type="submit" value="Crear" class="btn btn-primary" />
+                    <a asp-action="Index" class="btn btn-secondary ms-2">Volver a la lista</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,46 @@
+﻿@model CineMVC.Models.Funcion
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<div class="container mt-4">
+    <h1>Crear Función</h1>
+
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <div class="mb-3">
+                    <label asp-for="FechaHora" class="form-label"></label>
+                    <input asp-for="FechaHora" class="form-control" />
+                    <span asp-validation-for="FechaHora" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="PrecioEntrada" class="form-label"></label>
+                    <input asp-for="PrecioEntrada" class="form-control" />
+                    <span asp-validation-for="PrecioEntrada" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="PeliculaId" class="form-label"></label>
+                    <select asp-for="PeliculaId" class="form-select" asp-items="ViewBag.PeliculaId"></select>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="SalaId" class="form-label"></label>
+                    <select asp-for="SalaId" class="form-select" asp-items="ViewBag.SalaId"></select>
+                </div>
+                <div class="mb-3">
+                    <input type="submit" value="Crear" class="btn btn-primary" />
+                    <a asp-action="Index" class="btn btn-secondary ms-2">Volver</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

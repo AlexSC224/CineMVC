@@ -1,0 +1,26 @@
+﻿@model CineMVC.Models.Sala
+
+@{
+    ViewData["Title"] = "Eliminar";
+}
+
+<div class="container mt-4">
+    <h1>Eliminar Sala</h1>
+    <h3 class="mb-3">¿Estás seguro de que quieres eliminar esta sala?</h3>
+    <div>
+        <h4 class="mb-3">Sala</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">Nombre</dt>
+            <dd class="col-sm-10">@Html.DisplayFor(model => model.Nombre)</dd>
+            <dt class="col-sm-2">Capacidad</dt>
+            <dd class="col-sm-10">@Html.DisplayFor(model => model.Capacidad)</dd>
+        </dl>
+
+        <form asp-action="Delete" class="mt-3">
+            <input type="hidden" asp-for="Id" />
+            <input type="submit" value="Eliminar" class="btn btn-danger" />
+            <a asp-action="Index" class="btn btn-secondary ms-2">Volver a la lista</a>
+        </form>
+    </div>
+</div>

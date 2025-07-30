@@ -44,6 +44,15 @@ namespace CineMVC.Data
                 .WithMany(f => f.Reservas)
                 .HasForeignKey(r => r.FuncionId);
 
+            // 🔧 Configurar precisión para decimales
+            builder.Entity<Funcion>()
+                .Property(f => f.PrecioEntrada)
+                .HasPrecision(18, 2);
+
+            builder.Entity<Reserva>()
+                .Property(r => r.Total)
+                .HasPrecision(18, 2);
+
             // Datos iniciales para Peliculas
             builder.Entity<Pelicula>().HasData(
                 new Pelicula
@@ -76,13 +85,14 @@ namespace CineMVC.Data
                 new Sala { Id = 2, Nombre = "Sala 2", Capacidad = 80 }
             );
 
+            // Datos iniciales para Funciones
             builder.Entity<Funcion>().HasData(
                 new Funcion
                 {
                     Id = 1,
                     PeliculaId = 1,
                     SalaId = 1,
-                    FechaHora = new DateTime(2025, 8, 1, 18, 0, 0), 
+                    FechaHora = new DateTime(2025, 8, 1, 18, 0, 0),
                     PrecioEntrada = 30.00m
                 },
                 new Funcion
@@ -94,8 +104,7 @@ namespace CineMVC.Data
                     PrecioEntrada = 25.00m
                 }
             );
-
-
         }
+
     }
 }

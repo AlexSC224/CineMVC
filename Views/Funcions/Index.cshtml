@@ -1,0 +1,57 @@
+﻿@model IEnumerable<CineMVC.Models.Funcion>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="container mt-4">
+
+    <p>
+        <a asp-action="Create" class="btn btn-primary">Crear Función</a>
+    </p>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.FechaHora)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.PrecioEntrada)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Pelicula)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Sala)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.FechaHora)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.PrecioEntrada)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Pelicula.Id)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Sala.Id)
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning me-1">Edit</a>
+@*                             <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info me-1">Details</a>
+ *@                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

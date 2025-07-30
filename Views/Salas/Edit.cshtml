@@ -1,0 +1,39 @@
+﻿@model CineMVC.Models.Sala
+
+@{
+    ViewData["Title"] = "Editar";
+}
+
+<div class="container mt-4">
+    <h1>Editar Sala</h1>
+    <h4 class="mb-3">Sala</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <input type="hidden" asp-for="Id" />
+                <div class="mb-3">
+                    <label asp-for="Nombre" class="form-label">Nombre</label>
+                    <input asp-for="Nombre" class="form-control" />
+                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Capacidad" class="form-label">Capacidad</label>
+                    <input asp-for="Capacidad" class="form-control" type="number" min="1" />
+                    <span asp-validation-for="Capacidad" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <input type="submit" value="Guardar" class="btn btn-primary" />
+                    <a asp-action="Index" class="btn btn-secondary ms-2">Volver a la lista</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

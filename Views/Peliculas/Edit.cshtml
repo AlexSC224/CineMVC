@@ -1,0 +1,87 @@
+﻿@model CineMVC.Models.Pelicula
+
+@{
+    ViewData["Title"] = "Editar";
+}
+
+<div class="container mt-4">
+    <h1>Editar Película</h1>
+    <h4 class="mb-3">Película</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Edit" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <input type="hidden" asp-for="Id" />
+                <div class="mb-3">
+                    <label asp-for="ImagenBase64" class="form-label">Imagen</label>
+                    <input type="file" accept="image/*" class="form-control" id="imageInput" onchange="previewImage(this)" />
+                    <input type="hidden" asp-for="ImagenBase64" />
+                    <span asp-validation-for="ImagenBase64" class="text-danger"></span>
+                    @if (!string.IsNullOrEmpty(Model.ImagenBase64))
+                    {
+                        <img id="imagePreview" src="data:image/jpeg;base64,@Model.ImagenBase64" alt="Vista previa" class="img-thumbnail mt-2" style="max-width: 150px; max-height: 150px;" />
+                    }
+                    else
+                    {
+                        <img id="imagePreview" src="" alt="Vista previa" class="img-thumbnail mt-2 d-none" style="max-width: 150px; max-height: 150px;" />
+                    }
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Titulo" class="form-label">Título</label>
+                    <input asp-for="Titulo" class="form-control" />
+                    <span asp-validation-for="Titulo" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Duracion" class="form-label">Duración</label>
+                    <input asp-for="Duracion" class="form-control" />
+                    <span asp-validation-for="Duracion" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Genero" class="form-label">Género</label>
+                    <input asp-for="Genero" class="form-control" />
+                    <span asp-validation-for="Genero" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Clasificacion" class="form-label">Clasificación</label>
+                    <input asp-for="Clasificacion" class="form-control" />
+                    <span asp-validation-for="Clasificacion" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Sinopsis" class="form-label">Sinopsis</label>
+                    <textarea asp-for="Sinopsis" class="form-control" rows="4"></textarea>
+                    <span asp-validation-for="Sinopsis" class="text-danger"></span>
+                </div>
+                <div class="mb-3 form-check">
+                    <input class="form-check-input" asp-for="Activa" />
+                    <label class="form-check-label" asp-for="Activa">Activa</label>
+                </div>
+                <div class="mb-3">
+                    <input type="submit" value="Guardar" class="btn btn-primary" />
+                    <a asp-action="Index" class="btn btn-secondary ms-2">Volver a la lista</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        function previewImage(input) {
+            const preview = document.getElementById('imagePreview');
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('d-none');
+                    document.querySelector('input[name="ImagenBase64"]').value = e.target.result.split(',')[1];
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+}
