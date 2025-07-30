@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CineMVC.Data;
 using CineMVC.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CineMVC.Controllers
 {

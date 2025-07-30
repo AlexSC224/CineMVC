@@ -1,0 +1,167 @@
+﻿@model IEnumerable<CineMVC.Models.Funcion>
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+
+@{
+    ViewData["Title"] = "Funciones Disponibles";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Funciones Disponibles</h2>
+
+    @if (!Model.Any())
+    {
+        <p>No hay funciones programadas para esta película.</p>
+    }
+    else
+    {
+        <table class="table table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Fecha y Hora</th>
+                    <th>Sala</th>
+                    <th>Precio</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var funcion in Model)
+                {
+                    <tr>
+                        <td>@funcion.FechaHora.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@funcion.Sala.Nombre</td>
+                        <td>@funcion.PrecioEntrada.ToString("C")</td>
+                        <td>
+                            @if (User.Identity.IsAuthenticated && User.IsInRole("Cliente"))
+                            {
+                                <button class="btn btn-success btn-sm"
+                                        onclick="abrirModalReserva(@funcion.Id, '@funcion.Pelicula.Titulo', '@funcion.Sala.Nombre', '@funcion.FechaHora.ToString("yyyy-MM-ddTHH:mm")', @funcion.PrecioEntrada.ToString(System.Globalization.CultureInfo.InvariantCulture))">
+                                    Comprar Entradas
+                                </button>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Inicia sesión como cliente para reservar</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+<!-- Modal de reserva -->
+<div class="modal fade" id="modalReserva" tabindex="-1" aria-labelledby="modalReservaLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalReservaLabel">Reserva de Entradas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                @Html.AntiForgeryToken() <!-- 🔐 Token necesario -->
+
+                <input type="hidden" id="FuncionId" name="FuncionId" />
+
+                <p><strong>Película:</strong> <span id="peliculaModal"></span></p>
+                <p><strong>Sala:</strong> <span id="salaModal"></span></p>
+                <p><strong>Horario:</strong> <span id="fechaHoraModal"></span></p>
+                <p><strong>Precio por entrada:</strong> <span id="precioModal"></span></p>
+
+                <div class="mb-3">
+                    <label class="form-label">Cantidad de Entradas</label>
+                    <input type="number" class="form-control" min="1" id="CantidadEntradas" name="CantidadEntradas" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Total</label>
+                    <input type="number" class="form-control" id="Total" name="Total" step="0.01" readonly />
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="enviarReserva()">Confirmar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- Para mensajes bonitos -->
+
+    <script>
+        let precioGlobal = 0;
+
+        function abrirModalReserva(funcionId, pelicula, sala, fechaHora, precio) {
+            document.getElementById("FuncionId").value = funcionId;
+            document.getElementById("peliculaModal").innerText = pelicula;
+            document.getElementById("salaModal").innerText = sala;
+            document.getElementById("fechaHoraModal").innerText = new Date(fechaHora).toLocaleString();
+            document.getElementById("precioModal").innerText = parseFloat(precio).toLocaleString('es-BO', { style: 'currency', currency: 'BOB' });
+
+            precioGlobal = parseFloat(precio);
+            document.getElementById("CantidadEntradas").value = 1;
+            document.getElementById("Total").value = precioGlobal.toFixed(2);
+
+            const modal = new bootstrap.Modal(document.getElementById("modalReserva"));
+            modal.show();
+        }
+
+        document.getElementById("CantidadEntradas").addEventListener("input", function () {
+            const cantidad = parseInt(this.value) || 0;
+            document.getElementById("Total").value = (cantidad * precioGlobal).toFixed(2);
+        });
+
+        async function enviarReserva() {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            const funcionId = document.getElementById("FuncionId").value;
+            const cantidad = document.getElementById("CantidadEntradas").value;
+            const total = document.getElementById("Total").value;
+
+            const body = new URLSearchParams();
+            body.append("__RequestVerificationToken", token);
+            body.append("FuncionId", funcionId);
+            body.append("CantidadEntradas", cantidad);
+            body.append("Total", total);
+
+            try {
+                const response = await fetch('/Reservas/Create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': token
+                    },
+                    body: body
+                });
+
+                if (response.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById("modalReserva")).hide();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Reserva Confirmada',
+                        text: 'Tu reserva ha sido realizada con éxito.',
+                        confirmButtonText: 'Aceptar'
+                    }).then(() => location.reload());
+                } else {
+                    const errorData = await response.json();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: errorData.message || 'No se pudo realizar la reserva.'
+                    });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error de conexión',
+                    text: 'Intenta nuevamente más tarde.'
+                });
+            }
+        }
+    </script>
+}

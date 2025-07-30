@@ -2,12 +2,18 @@
 
 @{
     ViewData["Title"] = "Índice";
+    bool esAdmin = User.IsInRole("Administrador");
+    bool esCliente = User.IsInRole("Cliente");
 }
 
 <div class="container mt-4">
-    <p class="mb-4">
-        <a asp-action="Create" class="btn btn-primary">Crear Nueva Reserva</a>
-    </p>
+    @if (esAdmin)
+    {
+        <p class="mb-4">
+            <a asp-action="Create" class="btn btn-primary">Crear Nueva Reserva</a>
+        </p>
+    }
+
     <div class="table-responsive">
         <table class="table table-striped table-hover">
             <thead class="table-dark">
@@ -16,41 +22,52 @@
                     <th>Función</th>
                     <th>Cantidad de Entradas</th>
                     <th>Total</th>
-                    <th>Acciones</th>
+                    @if (esAdmin)
+                    {
+                        <th>Acciones</th>
+                    }
                 </tr>
             </thead>
             <tbody>
                 @foreach (var item in Model)
                 {
-                    <tr>
-                        <td>
-                            @if (item.Usuario != null)
+                    // Mostrar solo las reservas del usuario cliente, o todas si es Admin
+                    if (esAdmin || item.UserId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+                    {
+                        <tr>
+                            <td>
+                                @if (item.Usuario != null)
+                                {
+                                    @Html.DisplayFor(modelItem => item.Usuario.UserName)
+                                }
+                                else
+                                {
+                                    <span>Sin usuario</span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.Funcion != null)
+                                {
+                                    @Html.DisplayFor(modelItem => item.Funcion.Pelicula.Titulo)
+                                    <small>(@Html.DisplayFor(modelItem => item.Funcion.FechaHora))</small>
+                                }
+                                else
+                                {
+                                    <span>Sin función</span>
+                                }
+                            </td>
+                            <td>@Html.DisplayFor(modelItem => item.CantidadEntradas)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Total)</td>
+
+                            @if (esAdmin)
                             {
-                                @Html.DisplayFor(modelItem => item.Usuario.UserName)
+                                <td>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning me-1">Editar</a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Eliminar</a>
+                                </td>
                             }
-                            else
-                            {
-                                <span>Sin usuario</span>
-                            }
-                        </td>
-                        <td>
-                            @if (item.Funcion != null)
-                            {
-                                @Html.DisplayFor(modelItem => item.Funcion.Pelicula.Titulo) <small>(@Html.DisplayFor(modelItem => item.Funcion.FechaHora))</small>
-                            }
-                            else
-                            {
-                                <span>Sin función</span>
-                            }
-                        </td>
-                        <td>@Html.DisplayFor(modelItem => item.CantidadEntradas)</td>
-                        <td>@Html.DisplayFor(modelItem => item.Total)</td>
-                        <td>
-                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning me-1">Editar</a>
-@*                             <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info me-1">Detalles</a>
- *@                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Eliminar</a>
-                        </td>
-                    </tr>
+                        </tr>
+                    }
                 }
             </tbody>
         </table>

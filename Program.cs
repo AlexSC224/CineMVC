@@ -11,10 +11,18 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+        .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
+
+// Crear roles al iniciar
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await CreateRoles(services);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -44,3 +52,48 @@ app.MapRazorPages()
    .WithStaticAssets();
 
 app.Run();
+
+
+// M�TODO PARA CREAR ROLES
+async Task CreateRoles(IServiceProvider serviceProvider)
+{
+    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+    string[] roles = { "Administrador", "Empleado", "Cliente" };
+
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+
+    string adminEmail = "admin@cinemvc.com";
+    string adminPassword = "Admin123@!"; 
+
+    var adminUser = await userManager.FindByEmailAsync(adminEmail);
+    if (adminUser == null)
+    {
+        var user = new IdentityUser
+        {
+            UserName = adminEmail,
+            Email = adminEmail,
+            EmailConfirmed = true
+        };
+
+        var result = await userManager.CreateAsync(user, adminPassword);
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(user, "Administrador");
+        }
+    }
+    else
+    {
+        if (!await userManager.IsInRoleAsync(adminUser, "Administrador"))
+        {
+            await userManager.AddToRoleAsync(adminUser, "Administrador");
+        }
+    }
+}

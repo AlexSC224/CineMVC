@@ -7,17 +7,23 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CineMVC.Data;
 using CineMVC.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace CineMVC.Controllers
 {
+    [Authorize(Roles = "Cliente")]
     public class ReservasController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public ReservasController(ApplicationDbContext context)
+        public ReservasController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
+
 
         // GET: Reservas
         public async Task<IActionResult> Index()
@@ -59,17 +65,24 @@ namespace CineMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,UserId,FuncionId,CantidadEntradas,Total")] Reserva reserva)
+        public async Task<IActionResult> Create([FromForm] int FuncionId, [FromForm] int CantidadEntradas, [FromForm] decimal Total)
         {
-            if (ModelState.IsValid)
+            var user = await _userManager.GetUserAsync(User); // obtiene el usuario logueado
+            if (user == null)
+                return Unauthorized();
+
+            var reserva = new Reserva
             {
-                _context.Add(reserva);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["FuncionId"] = new SelectList(_context.Funciones, "Id", "Id", reserva.FuncionId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", reserva.UserId);
-            return View(reserva);
+                FuncionId = FuncionId,
+                CantidadEntradas = CantidadEntradas,
+                Total = Total,
+                UserId = user.Id // se asigna automáticamente desde el usuario autenticado
+            };
+
+            _context.Add(reserva);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true }); // devuelve respuesta para el fetch
         }
 
         // GET: Reservas/Edit/5
@@ -160,6 +173,24 @@ namespace CineMVC.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+        [Authorize(Roles = "Cliente")]
+        public IActionResult Create(int funcionId)
+        {
+            var funcion = _context.Funciones
+                .Include(f => f.Pelicula)
+                .Include(f => f.Sala)
+                .FirstOrDefault(f => f.Id == funcionId);
+
+            if (funcion == null) return NotFound();
+
+            var reserva = new Reserva
+            {
+                FuncionId = funcion.Id,
+                Funcion = funcion
+            };
+
+            return View(reserva);
         }
 
         private bool ReservaExists(int id)

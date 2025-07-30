@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CineMVC.Data;
 using CineMVC.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CineMVC.Controllers
 {
+    [Authorize(Roles = "Administrador,Empleado")]
     public class FuncionsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -49,10 +51,11 @@ namespace CineMVC.Controllers
         // GET: Funcions/Create
         public IActionResult Create()
         {
-            ViewData["PeliculaId"] = new SelectList(_context.Peliculas, "Id", "Id");
-            ViewData["SalaId"] = new SelectList(_context.Salas, "Id", "Id");
+            ViewData["PeliculaId"] = new SelectList(_context.Peliculas, "Id", "Titulo");
+            ViewData["SalaId"] = new SelectList(_context.Salas, "Id", "Nombre");
             return View();
         }
+
 
         // POST: Funcions/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -161,6 +164,18 @@ namespace CineMVC.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+        [AllowAnonymous]
+        public async Task<IActionResult> PorPelicula(int id)
+        {
+            var funciones = await _context.Funciones
+                .Include(f => f.Sala)
+                .Include(f => f.Pelicula)
+                .Where(f => f.PeliculaId == id && f.FechaHora >= DateTime.Now)
+                .ToListAsync();
+
+            return View(funciones);
+        }
+
 
         private bool FuncionExists(int id)
         {
