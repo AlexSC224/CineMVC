@@ -92,7 +92,7 @@ namespace CineMVC.Data
                     Id = 1,
                     PeliculaId = 1,
                     SalaId = 1,
-                    FechaHora = new DateTime(2025, 8, 1, 18, 0, 0),
+                    FechaHora = new DateTime(2025, 8, 1, 18, 0, 0, DateTimeKind.Utc), // Especificar UTC
                     PrecioEntrada = 30.00m
                 },
                 new Funcion
@@ -100,7 +100,7 @@ namespace CineMVC.Data
                     Id = 2,
                     PeliculaId = 2,
                     SalaId = 2,
-                    FechaHora = new DateTime(2025, 8, 2, 16, 0, 0),
+                    FechaHora = new DateTime(2025, 8, 2, 16, 0, 0, DateTimeKind.Utc), // Especificar UTC
                     PrecioEntrada = 25.00m
                 }
             );
